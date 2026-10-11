@@ -1,0 +1,4 @@
+# Keep SQL migration checksums consistent across Windows and Linux checkouts.
+* text=auto eol=lf
+*.png -text
+*.pdf -text

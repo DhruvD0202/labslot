@@ -1,0 +1,14 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+.local/
+.sites-runtime/
+coverage/
+*.log
+tmp/
+
+# Local course submissions are not part of the source repository.
+/database_systems_project_abstract.pdf
+/lab_equipment_booking_project_review_filled.pdf
