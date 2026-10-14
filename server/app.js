@@ -9,6 +9,9 @@ import { apiRouter } from './routes/api.js';
 export function createApp(pool, config) {
   const app = express();
   app.disable('x-powered-by');
+  // Trust a bounded, host-configured proxy path, never every forwarded address.
+  // Without this, sign-in attempts behind a hosting proxy share one IP bucket.
+  if (config.trustProxyHops) app.set('trust proxy', config.trustProxyHops);
   // FullCalendar sets inline styles. Scripts remain restricted to this origin.
   app.use(helmet({ contentSecurityPolicy: { directives: {
     'script-src': ["'self'"], 'style-src': ["'self'", "'unsafe-inline'"],

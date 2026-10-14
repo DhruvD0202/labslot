@@ -14,11 +14,11 @@ A lab equipment booking system built with **Vue 3, FullCalendar, Express, and Po
 - Check-in/check-out and a chronological activity log.
 - Real PostgreSQL integration tests, simultaneous HTTP requests, and a separate exclusion-constraint blocking test.
 
-This is a local MVP. Live deployment has not been performed. See [verification](docs/verification.md) for the actual test results and remaining limits.
+The local MVP works, and a free Render/Neon deployment configuration is included. A live application URL has not yet been verified. See [deployment](docs/deployment.md) for hosting, the [class demo guide](docs/demo-guide.md) for the walkthrough, and [verification](docs/verification.md) for actual test results and remaining limits.
 
 ## Quick start: no Docker required
 
-Requires Node.js **22.12 or later** and npm. The lockfile records the installed dependencies.
+Requires Node.js **22.12 or later within Node 22** and npm. The hosting configuration resolves the latest matching Node 22 release. The lockfile records the installed dependencies.
 
 ```sh
 npm ci
@@ -147,14 +147,14 @@ Priority is not a fairness guarantee: faculty demand can delay students, and an 
 Keep the local PostgreSQL server running, then open a second terminal:
 
 ```sh
-npm test
-npm run test:concurrency
 npm run check
 npm run build
+npm test
+npm run test:concurrency
 npm run test:production
 ```
 
-Tests use `TEST_DATABASE_URL` if supplied, otherwise `DATABASE_URL`. They create a uniquely named disposable schema, apply the actual migrations, and remove only that schema afterward. They require schema-creation privileges. A controlled test-only clock makes the 24-hour boundary deterministic. There are no mocked database queries or SQLite substitutes.
+Build the frontend with `npm run build` before `npm test`: the hosted-startup case serves the actual built bundle. Tests use `TEST_DATABASE_URL` if supplied, otherwise `DATABASE_URL`. Database tests create uniquely named disposable schemas, apply the actual migrations, and remove only those schemas afterward. They require schema-creation privileges. A controlled test-only clock makes the scheduling boundaries deterministic. The scheduling and startup cases run against real PostgreSQL; separate proxy tests exercise the actual HTTP limiter without a database query.
 
 The default concurrency demo submits 20 simultaneous HTTP booking requests through the real Express app into PostgreSQL, with this verified result:
 
@@ -194,20 +194,22 @@ Booking and waitlist bodies use `equipment_id`, `start_time`, `end_time`, and `r
 
 ## A five-minute demonstration
 
-1. Sign in as the student; select the confocal microscope and inspect a seeded session.
-2. Request an overlapping interval. Show the conflict and join the waitlist.
-3. Sign in as faculty. Request the same student-held interval with an override reason, at least 24 hours ahead.
-4. Show the faculty calendar entry, the student's displaced record and waiting request, and the linked activity events.
-5. Cancel the faculty booking. Show a waiting request confirmed in the same transaction.
-6. In another terminal, run `npm run test:concurrency`, then show the SQL exclusion constraint and the rollback tests.
+1. Open student and faculty roles in separate tabs. Choose the 3D printer and a free interval at least three days ahead.
+2. Create a student booking, then try the exact interval again to show the conflict. Close the failed request.
+3. As faculty, request the student-held interval with an explicit override reason.
+4. Refresh the student tab. Show the displaced booking under All history and its original interval in Waitlist.
+5. Cancel the faculty booking. Refresh and show an eligible waiting request confirmed, with the linked activity events.
+6. Use the recorded concurrency results or run the test against the local development database before class.
+
+The [step-by-step demo guide](docs/demo-guide.md) includes the exact buttons, spoken explanations and what to check if another visitor has changed the shared demo.
 
 ## Deployment path
 
-The simplest first deployment serves the built Vue app **from Express on the same origin**, plus a managed PostgreSQL database. `npm run build` creates `dist/`; `npm start` serves both `/api` and the frontend. Set `HOST=0.0.0.0`, use the platform's `PORT`, configure a production database/JWT secret, set `NODE_ENV=production`, and apply migrations as a release step. `btree_gist` must be supported. Follow your database provider's verified TLS configuration; do not disable certificate verification as a workaround.
+The included `render.yaml` serves the built Vue app **from Express on the same origin**, using a free Render web service and managed PostgreSQL on Neon. `npm run start:hosted` applies migrations, optionally seeds the demo, and starts the normal server. This works without a paid pre-deploy feature. Database preparation must succeed before the server accepts traffic. The [deployment guide](docs/deployment.md) covers accounts, private environment variables, verified TLS, startup and live verification.
 
-For a deployment with real accounts, disable `VITE_DEMO_MODE` at build time and provision faculty through a controlled administrative process. The demo seed is optional. A public portfolio demo can intentionally retain demo accounts, with their broad faculty permissions made clear. The current configuration has not been deployed or validated on Render, Railway, or Vercel. A separate frontend host would need an API proxy or deliberately configured CORS.
+For real accounts, disable `VITE_DEMO_MODE` at build time and `SEED_DEMO` at runtime, then provision faculty through a controlled administrative process. The portfolio configuration deliberately enables shared fictional demo accounts, including faculty permissions. Hosted deployment is not verified until the documented live checks pass. A separate frontend host would need an API proxy or deliberately configured CORS.
 
-Before treating this as a production service, add a distinct least-privilege runtime database role, appropriate trusted-proxy/rate-limit configuration for the host, account recovery, operational monitoring, and tested backups. The local DB account is a development owner, and the audit trail is append-only through normal application operations, not tamper-proof against the database owner.
+The bounded `TRUST_PROXY_HOPS` setting supports hosted sign-in rate limiting; its value must match the actual proxy path. Before treating this as a production service, add a distinct least-privilege runtime database role, account recovery, operational monitoring, and tested backups. The demo database account owns its schema, and the audit trail is append-only through normal application operations, not tamper-proof against that owner.
 
 JWTs are held in per-tab session storage in this MVP. Logout clears the tab's token; there is no server-side token revocation or refresh-token flow. This storage remains accessible to same-origin JavaScript. The app uses a restrictive production script policy and avoids rendering user input as HTML.
 

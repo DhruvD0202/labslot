@@ -6,7 +6,7 @@ const config = getConfig();
 const pool = createPool(config.databaseUrl);
 await pool.query('SELECT 1');
 const server = createApp(pool, config).listen(config.port, config.host, () => {
-  console.log(`LabSlot API: http://${config.host}:${config.port}`);
+  console.log(`LabSlot API: http://${config.host}:${server.address().port}`);
 });
 async function stop() {
   server.close(async () => { await pool.end(); process.exit(0); });
