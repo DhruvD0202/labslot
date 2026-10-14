@@ -30,12 +30,32 @@ The Render/Neon configuration was checked locally on Windows x64 with Node 22.19
 
 `npm run check`, the production build, and the production-serving smoke check passed. The standalone concurrency check again produced **20 simultaneous HTTP requests, 1 confirmation, 19 conflicts and 1 stored reservation**. Test schemas were removed; the normal local demo records were preserved.
 
-A Neon PostgreSQL 18 project was created in AWS Singapore. This is provisioning evidence only: the hosted app, Neon migrations, cloud proxy topology, and a public website URL are **not yet verified**. Local startup and proxy checks do not replace those live checks. The [deployment guide](deployment.md) lists the checks needed before claiming the app is deployed.
+A Neon PostgreSQL 18 project was created in AWS Singapore. The application migrations and demo seed were applied, the actual exclusion constraint was inspected, and the Node PostgreSQL client verified the database connection's TLS certificate.
+
+## Live deployment - 15 October 2026
+
+Website: **[labslot.onrender.com](https://labslot.onrender.com)**. Render Free Node service and Neon PostgreSQL **18.6**, both in Singapore. Render selected Node **22.23.3** from the project's Node 22 engine range.
+
+The following checks were made through HTTPS against the deployed Express API and its real Neon database, using fictional shared demo accounts:
+
+| Check | Observed result |
+| --- | --- |
+| API readiness | HTTP 200; PostgreSQL connected |
+| Frontend serving | Built Vue HTML and JavaScript returned HTTP 200; production script policy present |
+| Authentication | Student and faculty demo accounts signed in with their correct roles |
+| Booking | Student reservation created for the 3D printer, 18 October 2026, 10:00–11:00 IST |
+| Overlap | A duplicate request returned HTTP 409 with `SLOT_CONFLICT` |
+| Faculty override | Justified override created; original student reservation became `displaced`; its exact interval entered the waitlist |
+| Cancellation and promotion | Cancelling the faculty reservation returned a promoted reservation; the student received a new `reserved` row while the original row stayed displaced |
+| Activity | Events linked to the original, faculty and promoted reservations were retained |
+| Cleanup | The verification student's promoted reservation was cancelled, freeing that interval; history was retained |
+
+These are deployed workflow checks, not a repeat of the 20-request concurrency test against the hosted database. The concurrency result above remains a local correctness test. The actual cloud proxy address chain has not been independently inspected; a successful sign-in does not establish per-client rate-limit isolation on Render.
 
 ## Limits of these results
 
 - This demonstrates the tested correctness scenarios, not unlimited throughput, a full load test, or a proof covering every possible transaction interleaving.
-- Live deployment, cross-host behavior, backups/recovery, and production privilege separation have not been verified.
+- Production load, backups/recovery, production privilege separation, and cloud proxy address handling have not been verified.
 - A raw database owner can bypass application policy and alter triggers; audit history is not tamper-proof against that owner.
 - Account-role/equipment-status administrative changes during a scheduling transaction are outside the exposed MVP workflows.
 - No email notifications, password reset, refresh tokens, billing, recurring bookings, pooled capacity, or multi-campus timezone support.

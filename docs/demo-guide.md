@@ -1,5 +1,7 @@
 # A five-minute LabSlot class demo
 
+Open **[labslot.onrender.com](https://labslot.onrender.com)**. The workflow below passed live verification on 15 October 2026.
+
 Use the same website in two independently opened tabs: one as a student and one as faculty. Each tab keeps its own sign-in token. If a duplicated tab copied a token, log out of that tab and choose the other role. Do not open both roles in the same tab.
 
 ## Prepare once

@@ -14,7 +14,9 @@ A lab equipment booking system built with **Vue 3, FullCalendar, Express, and Po
 - Check-in/check-out and a chronological activity log.
 - Real PostgreSQL integration tests, simultaneous HTTP requests, and a separate exclusion-constraint blocking test.
 
-The local MVP works, and a free Render/Neon deployment configuration is included. A live application URL has not yet been verified. See [deployment](docs/deployment.md) for hosting, the [class demo guide](docs/demo-guide.md) for the walkthrough, and [verification](docs/verification.md) for actual test results and remaining limits.
+**Live demo: [labslot.onrender.com](https://labslot.onrender.com)** — hosted on Render with PostgreSQL on Neon. Choose **Student demo** or **Faculty demo**, then **Enter workspace**. The shared accounts contain fictional data. The free web service can take about a minute to wake after inactivity.
+
+The live booking, overlap rejection, faculty override, cancellation and waitlist-promotion flow was verified on **15 October 2026**. See [deployment](docs/deployment.md) for hosting, the [class demo guide](docs/demo-guide.md) for the walkthrough, and [verification](docs/verification.md) for actual test results and remaining limits.
 
 ## Quick start: no Docker required
 
@@ -33,7 +35,7 @@ Open **http://127.0.0.1:5173**. The first run initializes a real, persistent Pos
 | Faculty | `faculty@labslot.demo` | `LabSlot-demo-2026!` |
 | Second student | `riya@labslot.demo` | `LabSlot-demo-2026!` |
 
-The **Student demo** and **Faculty demo** buttons fill the form; click **Enter workspace** to sign in. These are deliberately public local demo credentials, not deployment secrets. They are created only by the seed script. Public registration always creates a student.
+The **Student demo** and **Faculty demo** buttons fill the form; click **Enter workspace** to sign in. These are deliberately public demo credentials, not deployment secrets. They are created only by the seed script. Public registration always creates a student.
 
 The `.local/` database directory and `.env` are ignored by Git. Restarting preserves bookings and does not overwrite existing accounts. The seed creates sample bookings only when the schedule is empty. Changing `DEMO_PASSWORD` later does not change existing passwords. Stop with Ctrl+C before starting another copy. The embedded runtime is for local development, not production deployment.
 
@@ -41,7 +43,7 @@ If `.env` already points to another database, `npm run demo` stops without repla
 
 ## Use your own PostgreSQL or Docker
 
-1. Create a development database on PostgreSQL 16+ with permission to install `btree_gist`. This project has been tested on 18.4.
+1. Create a development database on PostgreSQL 16+ with permission to install `btree_gist`. This project has been tested locally on 18.4 and in the hosted demo on 18.6.
 2. For a new setup, copy `.env.example` to `.env`, set `DATABASE_URL`, and generate a strong `JWT_SECRET`:
 
    ```sh
@@ -207,7 +209,7 @@ The [step-by-step demo guide](docs/demo-guide.md) includes the exact buttons, sp
 
 The included `render.yaml` serves the built Vue app **from Express on the same origin**, using a free Render web service and managed PostgreSQL on Neon. `npm run start:hosted` applies migrations, optionally seeds the demo, and starts the normal server. This works without a paid pre-deploy feature. Database preparation must succeed before the server accepts traffic. The [deployment guide](docs/deployment.md) covers accounts, private environment variables, verified TLS, startup and live verification.
 
-For real accounts, disable `VITE_DEMO_MODE` at build time and `SEED_DEMO` at runtime, then provision faculty through a controlled administrative process. The portfolio configuration deliberately enables shared fictional demo accounts, including faculty permissions. Hosted deployment is not verified until the documented live checks pass. A separate frontend host would need an API proxy or deliberately configured CORS.
+For real accounts, disable `VITE_DEMO_MODE` at build time and `SEED_DEMO` at runtime, then provision faculty through a controlled administrative process. The portfolio configuration deliberately enables shared fictional demo accounts, including faculty permissions. The live workflow checks passed; production-scale load and operational recovery are outside those checks. A separate frontend host would need an API proxy or deliberately configured CORS.
 
 The bounded `TRUST_PROXY_HOPS` setting supports hosted sign-in rate limiting; its value must match the actual proxy path. Before treating this as a production service, add a distinct least-privilege runtime database role, account recovery, operational monitoring, and tested backups. The demo database account owns its schema, and the audit trail is append-only through normal application operations, not tamper-proof against that owner.
 
@@ -217,7 +219,7 @@ JWTs are held in per-tab session storage in this MVP. Logout clears the tab's to
 
 > Built a Vue/Express equipment booking application with PostgreSQL GiST exclusion constraints, atomic waitlist promotion, faculty-priority triggers, and audit history; verified conflict handling with 20 simultaneous HTTP booking requests and database rollback/concurrency integration tests.
 
-Do not claim production scale, a live deployment, zero race conditions under every workload, or tamper-proof auditing. Report the environment and scope actually tested.
+The working Render/Neon demo also supports saying the application was deployed live. Do not claim production scale, zero race conditions under every workload, or tamper-proof auditing. The 20-request concurrency result was measured against local PostgreSQL; it is not a cloud load-test result.
 
 ## References
 
