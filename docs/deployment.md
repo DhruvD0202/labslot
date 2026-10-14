@@ -1,6 +1,6 @@
 # Host the portfolio demo on Render and Neon
 
-Status: configuration prepared; a live URL is verified only after deployment and the checks below. Use free plans for this class demo. No billing upgrade is required by this configuration.
+Live demo: **[labslot.onrender.com](https://labslot.onrender.com)**. The deployed booking, conflict, override and waitlist-promotion workflow was verified on **15 October 2026**. See [verification](verification.md) for the exact scope. Use free plans for this class demo. No billing upgrade is required by this configuration.
 
 The Vue bundle and Express API run together as one Render web service. Neon stores the actual PostgreSQL tables, constraints, functions and triggers. This uses the existing application, not a static mock-up. The database is separate from Render's temporary filesystem.
 
@@ -43,6 +43,8 @@ If configuring a Web Service manually, use these settings:
 | `DEMO_PASSWORD` | `LabSlot-demo-2026!` for the deliberately shared demo accounts |
 
 Render supplies `PORT`. The package's Node engine range selects the latest matching Node 22 release. Frontend requests use the same origin, so no separate API URL or CORS setup is needed.
+
+The current deployment was created as a Web Service with the settings above. Its `DATABASE_URL` and `JWT_SECRET` are stored in a private Render `.env` secret file, which Render makes available to this Node service. The application loads it with `dotenv`; the values are absent from GitHub and the frontend bundle. The Blueprint is an alternative reproducible setup that supplies the same values as private environment variables.
 
 Free Render services do not provide a pre-deploy command. `start:hosted` checks for the built app, applies checksum-verified migrations, optionally seeds demo records, and only then starts Express. A failed preparation step stops startup rather than accepting requests against an incomplete schema. Restarting preserves existing records and passwords. New deployment secrets do not belong in `.env.example` or `render.yaml`.
 
