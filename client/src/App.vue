@@ -254,7 +254,7 @@ onUnmounted(() => { clearInterval(pollTimer); clearTimeout(toastTimer); window.r
         <div v-if="authError" class="error-box" role="alert">{{ authError }}</div>
         <button class="button primary full-width" :disabled="authBusy"><LoaderCircle v-if="authBusy" class="spin" :size="17" />{{ authMode === 'login' ? 'Enter workspace' : 'Create student account' }}<ArrowRight :size="17" /></button>
       </form>
-      <div v-if="demoMode" class="demo-box"><span class="eyebrow">TAKE A LOOK AROUND</span><p>Use a local demo account to explore both roles.</p><div class="demo-buttons"><button @click="fillDemo('student')">Student demo<ArrowUpRight :size="14" /></button><button @click="fillDemo('faculty')">Faculty demo<ArrowUpRight :size="14" /></button></div></div>
+      <div v-if="demoMode" class="demo-box"><span class="eyebrow">TAKE A LOOK AROUND</span><p>Explore both roles with shared demo accounts. Please use fictional details.</p><div class="demo-buttons"><button @click="fillDemo('student')">Student demo<ArrowUpRight :size="14" /></button><button @click="fillDemo('faculty')">Faculty demo<ArrowUpRight :size="14" /></button></div></div>
       <p class="auth-note"><ShieldCheck :size="16" />One shared calendar. Every reservation accounted for.</p>
     </div></main>
   </div>

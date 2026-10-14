@@ -1,0 +1,28 @@
+# Public portfolio demo: one free Node service, with PostgreSQL hosted on Neon.
+# DATABASE_URL is supplied privately during setup, never stored in this file.
+services:
+  - type: web
+    name: labslot
+    runtime: node
+    plan: free
+    region: singapore
+    buildCommand: npm ci --include=dev && npm run build
+    startCommand: npm run start:hosted
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: HOST
+        value: 0.0.0.0
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: TRUST_PROXY_HOPS
+        value: "1"
+      - key: VITE_DEMO_MODE
+        value: "true"
+      - key: SEED_DEMO
+        value: "true"
+      - key: DEMO_PASSWORD
+        value: LabSlot-demo-2026!

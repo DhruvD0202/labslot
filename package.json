@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": ">=22.12"
+    "node": ">=22.12 <23"
   },
   "scripts": {
     "demo": "node scripts/demo.mjs",
@@ -13,6 +13,7 @@
     "dev:client": "vite --host 127.0.0.1",
     "build": "vite build",
     "start": "node server/index.js",
+    "start:hosted": "node scripts/start-hosted.mjs",
     "db:migrate": "node scripts/migrate.mjs",
     "db:seed": "node scripts/seed.mjs",
     "test": "node --test --test-concurrency=1 tests/*.test.js",

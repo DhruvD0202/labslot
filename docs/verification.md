@@ -24,6 +24,14 @@ Tests create and remove their own schemas. The domain data shown in the demo is 
 
 Screenshots from the running app: [equipment schedule](screenshots/schedule.png), [activity trail](screenshots/activity.png), [mobile day view](screenshots/mobile.png). Browser verification leaves its cancelled/displaced records in the normal audit history; the original student's interval was restored through promotion.
 
+## Hosting preparation - 15 October 2026
+
+The Render/Neon configuration was checked locally on Windows x64 with Node 22.19.0 and real PostgreSQL 18.4. All **25 automated tests passed**, with no failures or skips. The three additional cases cover real hosted startup into a disposable empty schema, idempotent migration/seeding and preservation after restart, per-client sign-in rate limits behind a configured proxy, and rejection of malformed proxy settings.
+
+`npm run check`, the production build, and the production-serving smoke check passed. The standalone concurrency check again produced **20 simultaneous HTTP requests, 1 confirmation, 19 conflicts and 1 stored reservation**. Test schemas were removed; the normal local demo records were preserved.
+
+A Neon PostgreSQL 18 project was created in AWS Singapore. This is provisioning evidence only: the hosted app, Neon migrations, cloud proxy topology, and a public website URL are **not yet verified**. Local startup and proxy checks do not replace those live checks. The [deployment guide](deployment.md) lists the checks needed before claiming the app is deployed.
+
 ## Limits of these results
 
 - This demonstrates the tested correctness scenarios, not unlimited throughput, a full load test, or a proof covering every possible transaction interleaving.
